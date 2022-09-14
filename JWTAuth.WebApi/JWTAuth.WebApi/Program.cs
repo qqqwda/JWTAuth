@@ -1,7 +1,10 @@
 using JWTAuth.WebApi.Interface;
 using JWTAuth.WebApi.Models;
 using JWTAuth.WebApi.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +32,30 @@ builder.Services.AddDbContext<DatabaseContext>
 builder.Services.AddTransient<IEmployees, EmployeeRepository>();
 
 builder.Services.AddControllers();
+
+/**
+ * [IMPORTANTE]
+ * Se agrega autenticación de JWT
+ */
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    /**
+     * We configured authorization middleware in the startup. Here we have passed the security key
+     * when creating the token and enabled validation of Issuer and Audience. Also, we have set “SaveToken” to true,
+     * which stores the bearer token in HTTP Context. So we can use the token later in the controller.
+     */
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -43,7 +70,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+/**Se agrega autenticación para JWT*/
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
