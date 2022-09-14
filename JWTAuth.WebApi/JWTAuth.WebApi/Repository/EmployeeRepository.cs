@@ -37,13 +37,13 @@ namespace JWTAuth.WebApi.Repository
 
         public Employee GetEmployeeDetails(int id)
         {
-            _logger.LogTrace("Inicio de método [GetEmployeeDetails]");
+            _logger.LogInformation("Inicio de método [GetEmployeeDetails]");
             try
             {
                 Employee? employee = _dbContext.Employees.Find(id);
                 if (employee != null)
                 {
-                    _logger.LogTrace("Fin de método [GetEmployeeDetails]");
+                    _logger.LogInformation("Fin de método [GetEmployeeDetails]");
                     return employee;
                 }
 

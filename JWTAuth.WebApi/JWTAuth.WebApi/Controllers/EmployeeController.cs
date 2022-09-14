@@ -1,9 +1,11 @@
 ﻿using JWTAuth.WebApi.Interface;
 using JWTAuth.WebApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JWTAuth.WebApi.Controllers
 {
+    [Authorize]
     [Route("/api/employee")]
     [ApiController]
     public class EmployeeController : ControllerBase
